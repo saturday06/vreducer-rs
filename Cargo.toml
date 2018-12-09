@@ -1,0 +1,13 @@
+[package]
+name = "vreducer"
+version = "0.1.0"
+authors = ["Isamu Mogi <isamu@leafytree.jp>"]
+edition = "2018"
+license = "MIT"
+
+[dependencies]
+structopt = "*"
+image = "*"
+byteorder = "*"
+serde_json = "*"
+gltf-json = "*"
