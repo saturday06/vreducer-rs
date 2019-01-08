@@ -173,7 +173,7 @@ impl Vrm {
         let length = reader.read_u32::<LE>()?;
         assert_eq!(gltf_magic, GLTF_MAGIC);
 
-        let json_length = reader.read_u32::<LE>()?;
+        let json_length = reader.read_u32::<LE>()?; // TODO: json lengthを信用しない方法
         let json_type = reader.read_u32::<LE>()?;
 
         assert_eq!(json_type, JSON_TYPE);

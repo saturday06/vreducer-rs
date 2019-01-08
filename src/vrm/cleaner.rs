@@ -541,6 +541,7 @@ impl BufferRelocator {
         let mut chunk_index = 0;
         let mut offset = 0;
         let mut chunks = Vec::new();
+        println!("relocate: {}/{}", offset, total_bytes);
         while offset < total_bytes {
             let chunk_length = reader.read_u32::<LE>()?;
             let chunk_type = reader.read_u32::<LE>()?;
@@ -559,18 +560,32 @@ impl BufferRelocator {
                             remaining_buffer_view_region.byte_offset as usize - chunk_offset;
                         let mut skip = Vec::new();
                         skip.resize(skip_bytes, 0);
+                        println!("skip {}", skip.len());
                         reader.read_exact(&mut skip)?;
                         chunk_offset += skip_bytes;
                     }
                     let read_start = chunk_bytes.len();
                     let read_bytes = remaining_buffer_view_region.byte_length as usize;
                     chunk_bytes.resize(chunk_bytes.len() + read_bytes, 0);
-                    reader.read_exact(&mut chunk_bytes[read_start..(read_start + read_bytes)])?;
+                    let mut actual_read_bytes = 0;
+                    loop {
+                        // 実際に読めるサイズが必要とされるサイズと違うことがある？
+                        let n = reader.read(&mut chunk_bytes[(read_start + actual_read_bytes)..(read_start + read_bytes)])?;
+                        actual_read_bytes += n;
+                        if actual_read_bytes == read_bytes {
+                            break;
+                        }
+                        if n == 0 {
+                            println!("read expected={} bytes, actual={} bytes", read_bytes, actual_read_bytes);
+                            break
+                        }
+                    }
                     chunk_offset += read_bytes;
                 }
                 if chunk_offset < chunk_length as usize {
                     let mut skip_bytes = Vec::new();
                     skip_bytes.resize(chunk_length as usize - chunk_offset, 0);
+                    println!("skip {}", skip_bytes.len());
                     reader.read_exact(&mut skip_bytes)?;
                     //println!("last chunk skipped: len={}", skip_bytes.len());
                 }
@@ -579,6 +594,7 @@ impl BufferRelocator {
             } else {
                 let mut skip_bytes = Vec::new();
                 skip_bytes.resize(chunk_length as usize, 0);
+                println!("skip {}", skip_bytes.len());
                 reader.read_exact(&mut skip_bytes)?;
                 //println!("chunk skipped: {} len={}", chunk_index, chunk_length);
             }

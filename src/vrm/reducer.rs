@@ -443,8 +443,8 @@ pub fn reduce_vroid(mut gltf: Value) -> Value {
     //    # バンプマップ、スフィアマップを削除
     //    print 'shrink materials...'
     //    gltf = shrink_materials(gltf)
-    println!("shrink materials");
-    gltf = shrink_materials(gltf);
+    //println!("shrink materials");
+    //gltf = shrink_materials(gltf);
     //
     //    # マテリアルを結合
     //    print 'combine materials...'
